@@ -1,0 +1,62 @@
+body, html {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.background-image-container {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  z-index: -1; /* Ensure the image stays in the background */
+  overflow: hidden;
+}
+
+.background-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* This will cover the entire area without stretching the image */
+}
+
+.container {
+  position: relative; /* Required for z-index to work */
+  z-index: 2; /* This will place the container above the background image */
+  width: 1130px; /* Example width, adjust as needed */
+  height: 612px;
+  /* max-width: 960px; /* Maximum width of the container, adjust as needed */
+  padding: 20px;
+  background-color: rgba(255, 255, 255, 255); /* Example background with opacity */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Example shadow */
+  border-radius: 10px; /* Example border radius */
+  text-align: center; /* Center text if desired */
+  display: flex; /* Enable Flexbox */
+  align-items: center; /* Center items vertically */
+  justify-content: space-around; /* Space out the children */
+  margin-top: 3px; /* Move down */
+  margin-left: 37px; /* Move right */
+  margin-bottom: 250px; /* Move up */
+  margin-right: 50px; /* Move left */
+}
+
+.left-content,
+.right-content {
+  flex: 1; /* Both take up equal space */
+  padding: 20px; /* Add padding for spacing */
+}
+
+.separator {
+  width: 2px; /* Thickness of the separator line */
+  background-color: #333; /* Color of the separator line */
+  height: 100%; /* Full height of the container */
+  margin: 0 20px; /* Margin on the sides of the separator for spacing */
+}
+
+.right-image {
+  max-width: 100%;
+  height: auto;
+  display: block; /* Removes bottom space under image */
+}
