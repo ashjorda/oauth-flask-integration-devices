@@ -23,36 +23,9 @@ secretID = os.environ['secretID']
 credentials = os.environ['credentials']
 
 
-@app.route("/")
-def main_page():
-    """Main Grant page"""
-    scopes = "meeting:recordings_read spark:all spark:kms cjp:config_write cjp:config cjds:admin_org_read cjds:admin_org_write"
-    params = {'client_id': clientID, 'scope': scopes}
-    devices_api = "https://webexapis.com/v1/device/authorize"
-    api_response = requests.post(url=devices_api, data=params)
-    response_json = api_response.json()
-
-    # Store device code in session to use it in polling later
-    session['device_code'] = response_json['device_code']
-
-    qrcode_url = response_json['verification_uri_complete']
-    verification_uri = response_json['verification_uri']
-    user_code = response_json['user_code']
-
-    # No need to print, unless for debugging. Instead, pass these to the template
-    qr_cde_generation(qrcode_url)
-
-    # Start polling in a separate thread
-    thread = Thread(target=poll_for_access_token, args=(session['device_code'],))
-    thread.start()
-
-    # Render the template and pass the necessary data
-    return render_template("index.html", verification_url=verification_uri, user_code=user_code)
-
-
 def qr_cde_generation(url):
     img = qrcode.make(url)
-    img.save('./static/css/qr_code.png')
+    img.save('./static/qr_code.png')
 
 
 def poll_for_access_token(device_code):
@@ -81,11 +54,46 @@ def poll_for_access_token(device_code):
             print("Response Code:", token_response.status_code, token_response.json()['errors'][0]['description'])
 
 
+def whoami():
+    people_api_url = "https://webexapis.com/v1/people/me?callingData=true"
+    headers = {'Authorization': f"Bearer {session['access_token']}"}
+    whoami_api = requests.get(url=people_api_url, headers=headers)
+    return whoami_api.json()
+
+
+@app.route("/")
+def main_page():
+    """Main Grant page"""
+    scopes = "meeting:recordings_read spark:all spark:kms cjp:config_write cjp:config cjds:admin_org_read cjds:admin_org_write"
+    params = {'client_id': clientID, 'scope': scopes}
+    devices_api = "https://webexapis.com/v1/device/authorize"
+    api_response = requests.post(url=devices_api, data=params)
+    response_json = api_response.json()
+
+    # Store device code in session to use it in polling later
+    session['device_code'] = response_json['device_code']
+
+    qrcode_url = response_json['verification_uri_complete']
+    verification_uri = response_json['verification_uri']
+    user_code = response_json['user_code']
+
+    # No need to print, unless for debugging. Instead, pass these to the template
+    qr_cde_generation(qrcode_url)
+
+    # Start polling in a separate thread
+    thread = Thread(target=poll_for_access_token, args=(session['device_code'],))
+    thread.start()
+
+    # Render the template and pass the necessary data
+    return render_template("index.html", verification_url=verification_uri, user_code=user_code)
+
+
 @app.route("/granted")
 def granted():
     # Check if the access token is ready and render the granted.html template
     if session['token_ready']:
-        return render_template("granted.html", access_token=session['access_token'])
+        studentinfo = whoami()
+        return render_template("granted.html", me=studentinfo)
     else:
         # If the token isn't ready, you might want to inform the user or redirect
         return "Access token not ready yet. Please try again later."
