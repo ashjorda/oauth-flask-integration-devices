@@ -40,7 +40,6 @@ def main_page():
     user_code = response_json['user_code']
 
     # No need to print, unless for debugging. Instead, pass these to the template
-    print(qrcode_url)
     qr_cde_generation(qrcode_url)
 
     # Start polling in a separate thread
@@ -68,14 +67,14 @@ def poll_for_access_token(device_code):
 
     # Polling every 5 seconds (adjust as needed)
     while True:
-        time.sleep(2)
+        time.sleep(3)
         token_response = requests.post(url=token_url, data=body, headers=headers)
         if token_response.status_code == 200:
             access_token = token_response.json()['access_token']
             # Store the access token in session or another secure place
             session['access_token'] = access_token
             session['token_ready'] = True
-            print("Access token obtained")
+            print(token_response.json())
             break
         else:
             # Handle other errors (e.g., 'slow_down', 'expired_token')
