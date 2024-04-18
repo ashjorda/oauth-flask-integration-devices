@@ -1,7 +1,8 @@
 {% extends "temp.html" %}
 
 {% block content %}
-    <h1>Welcome to Team Ashton Dojo Tech School</h1>
-    {{ me }}
+    <h1>Welcome to Team Ashton's Dojo Tech School</h1>
+    <br>
+    <a href="{{ url_for('whoami') }}" class="student-profile-button">Student Profile</a>
 {% endblock %}
     

@@ -92,11 +92,16 @@ def main_page():
 def granted():
     # Check if the access token is ready and render the granted.html template
     if session['token_ready']:
-        studentinfo = whoami()
-        return render_template("granted.html", me=studentinfo)
+        return render_template("granted.html")
     else:
         # If the token isn't ready, you might want to inform the user or redirect
         return "Access token not ready yet. Please try again later."
+
+
+@app.route("/whoami")
+def whoami():
+    studentinfo = whoami()
+    return render_template("whoami.html", me=studentinfo)
 
 
 @app.route("/access_token_ready")
