@@ -14,7 +14,8 @@ app.secret_key = os.urandom(16)
 session = {
     'access_token': None,
     'token_ready': False,
-    'device_code': None
+    'device_code': None,
+    'poll_interval': 0,
 }
 
 # Define your clientID and client secret
@@ -28,7 +29,7 @@ def qr_cde_generation(url):
     img.save('./static/qr_code.png')
 
 
-def poll_for_access_token(device_code):
+def poll_for_access_token(device_code, poll_interval):
     """Poll the token endpoint for an access token."""
     token_url = "https://webexapis.com/v1/device/token"
     headers = {'Authorization': f'Basic {credentials}'}
@@ -38,9 +39,9 @@ def poll_for_access_token(device_code):
         'grant_type': 'urn:ietf:params:oauth:grant-type:device_code'
     }
 
-    # Polling every 5 seconds (adjust as needed)
+    # Polling in seconds based on the poll_interval value
     while True:
-        time.sleep(3)
+        time.sleep(poll_interval)
         token_response = requests.post(url=token_url, data=body, headers=headers)
         if token_response.status_code == 200:
             access_token = token_response.json()['access_token']
@@ -54,11 +55,11 @@ def poll_for_access_token(device_code):
             print("Response Code:", token_response.status_code, token_response.json()['errors'][0]['description'])
 
 
-def whoami():
+def whoami_lookup():
     people_api_url = "https://webexapis.com/v1/people/me?callingData=true"
     headers = {'Authorization': f"Bearer {session['access_token']}"}
-    whoami_api = requests.get(url=people_api_url, headers=headers)
-    return whoami_api.json()
+    people_api = requests.get(url=people_api_url, headers=headers)
+    return people_api.json()
 
 
 @app.route("/")
@@ -69,9 +70,10 @@ def main_page():
     devices_api = "https://webexapis.com/v1/device/authorize"
     api_response = requests.post(url=devices_api, data=params)
     response_json = api_response.json()
-
+    print(response_json)
     # Store device code in session to use it in polling later
     session['device_code'] = response_json['device_code']
+    session['poll_interval'] = response_json['interval']
 
     qrcode_url = response_json['verification_uri_complete']
     verification_uri = response_json['verification_uri']
@@ -81,7 +83,7 @@ def main_page():
     qr_cde_generation(qrcode_url)
 
     # Start polling in a separate thread
-    thread = Thread(target=poll_for_access_token, args=(session['device_code'],))
+    thread = Thread(target=poll_for_access_token, args=(session['device_code'], session['poll_interval'],))
     thread.start()
 
     # Render the template and pass the necessary data
@@ -100,7 +102,7 @@ def granted():
 
 @app.route("/whoami")
 def whoami():
-    studentinfo = whoami()
+    studentinfo = whoami_lookup()
     return render_template("whoami.html", me=studentinfo)
 
 

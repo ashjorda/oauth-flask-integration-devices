@@ -9,8 +9,7 @@ body, html {
 .background-image-container {
     position: relative; /* Changed from absolute to relative */
     /* Other styles like width, height, etc. */
-    background-image: url('path-to-your-image.jpg'); /* Your background image */
-     background-size: 100% 100%; /* Cover the container */
+    background-size: 100% 100%; /* Cover the container */
     background-position: center; /* Center the background image within the container */
     background-repeat: no-repeat; /* Prevent the image from repeating */
 }
