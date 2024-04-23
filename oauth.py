@@ -13,6 +13,7 @@ app.secret_key = os.urandom(16)
 # Global storage for the access token
 session = {
     'access_token': None,
+    'refresh_token': None,
     'token_ready': False,
     'device_code': None,
     'poll_interval': 0,
@@ -20,6 +21,7 @@ session = {
 
 # Define your clientID and client secret
 clientID = os.environ['clientID']
+clientSecret = os.environ['secretID']
 credentials = os.environ['credentials']
 
 
@@ -41,24 +43,41 @@ def poll_for_access_token(device_code, poll_interval):
     # Polling in seconds based on the poll_interval value
     while True:
         time.sleep(poll_interval)
-        token_response = requests.post(url=token_url, data=body, headers=headers)
-        if token_response.status_code == 200:
-            access_token = token_response.json()['access_token']
+        token_request = requests.post(url=token_url, data=body, headers=headers)
+        if token_request.status_code == 200:
             # Store the access token in session or another secure place
-            session['access_token'] = access_token
+            session['access_token'] = token_request.json()['access_token']
+            session['refresh_token'] = token_request.json()['refresh_token']
             session['token_ready'] = True
-            print(token_response.json())
+            print(token_request.json())
             break
         else:
             # Handle other errors (e.g., 'slow_down', 'expired_token')
-            print("Response Code:", token_response.status_code, token_response.json()['errors'][0]['description'])
+            print("Response Code:", token_request.status_code,
+                  token_request.json()['errors'][0]['description'])
+
+
+def device_refresh_token():
+    refresh_token_url = "https://webexapis.com/v1/access_token"
+    refresh_headers = {'Content-type': 'application/x-www-form-urlencoded'}
+
+    refresh_body = {
+        'grant_type': 'refresh_token',
+        'client_id': f'{clientID}',
+        'client_secret': f'{clientSecret}',
+        'refresh_token': f'{session["refresh_token"]}',
+    }
+
+    token_refresh_reqeust = requests.post(url=refresh_token_url, data=refresh_body, headers=refresh_headers)
+    session['access_token'] = token_refresh_reqeust.json()['access_token']
+    session['refresh_token'] = token_refresh_reqeust.json()['refresh_token']
 
 
 def whoami_lookup():
     people_api_url = "https://webexapis.com/v1/people/me?callingData=true"
     headers = {'Authorization': f"Bearer {session['access_token']}"}
     people_api = requests.get(url=people_api_url, headers=headers)
-    return people_api.json()
+    return people_api
 
 
 @app.route("/")
@@ -103,6 +122,13 @@ def granted():
 def whoami():
     # Using the device access token, use /people API to display user information.
     user_info = whoami_lookup()
+
+    if user_info.status_code == 401:
+        device_refresh_token()
+        user_info = whoami_lookup()
+    else:
+        user_info = user_info.json()
+
     return render_template("whoami.html", me=user_info)
 
 
