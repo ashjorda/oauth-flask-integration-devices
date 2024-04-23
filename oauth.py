@@ -78,14 +78,14 @@ def main_page():
     verification_uri = device_auth_response['verification_uri']
     user_code = device_auth_response['user_code']
 
-    # No need to print, unless for debugging. Instead, pass these to the template
+    # Generate QR Code image
     qr_cde_generation(qrcode_url)
 
     # Start polling in a separate thread
     thread = Thread(target=poll_for_access_token, args=(session['device_code'], session['poll_interval'],))
     thread.start()
 
-    # Render the template and pass the necessary data
+    # Render the template and pass verification url, and user code for manual user authorization
     return render_template("index.html", verification_url=verification_uri, user_code=user_code)
 
 
@@ -101,8 +101,9 @@ def granted():
 
 @app.route("/whoami")
 def whoami():
-    student_info = whoami_lookup()
-    return render_template("whoami.html", me=student_info)
+    # Using the device access token, use /people API to display user information.
+    user_info = whoami_lookup()
+    return render_template("whoami.html", me=user_info)
 
 
 @app.route("/access_token_ready")
