@@ -20,7 +20,6 @@ session = {
 
 # Define your clientID and client secret
 clientID = os.environ['clientID']
-secretID = os.environ['secretID']
 credentials = os.environ['credentials']
 
 
@@ -65,7 +64,7 @@ def whoami_lookup():
 @app.route("/")
 def main_page():
     """Main Grant page"""
-    scopes = "meeting:recordings_read spark:all spark:kms cjp:config_write cjp:config cjds:admin_org_read cjds:admin_org_write"
+    scopes = "meeting:recordings_read spark:all spark:kms"
     params = {'client_id': clientID, 'scope': scopes}
     devices_api = "https://webexapis.com/v1/device/authorize"
     api_response = requests.post(url=devices_api, data=params)
@@ -102,8 +101,8 @@ def granted():
 
 @app.route("/whoami")
 def whoami():
-    studentinfo = whoami_lookup()
-    return render_template("whoami.html", me=studentinfo)
+    student_info = whoami_lookup()
+    return render_template("whoami.html", me=student_info)
 
 
 @app.route("/access_token_ready")
