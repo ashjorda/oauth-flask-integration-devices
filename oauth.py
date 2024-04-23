@@ -66,17 +66,17 @@ def main_page():
     """Main Grant page"""
     scopes = "meeting:recordings_read spark:all spark:kms"
     params = {'client_id': clientID, 'scope': scopes}
-    devices_api = "https://webexapis.com/v1/device/authorize"
-    api_response = requests.post(url=devices_api, data=params)
-    response_json = api_response.json()
-    print(response_json)
+    device_auth_url = "https://webexapis.com/v1/device/authorize"
+    device_auth_request = requests.post(url=device_auth_url, data=params)
+    device_auth_response = device_auth_request.json()
+    print(device_auth_response)
     # Store device code in session to use it in polling later
-    session['device_code'] = response_json['device_code']
-    session['poll_interval'] = response_json['interval']
+    session['device_code'] = device_auth_response['device_code']
+    session['poll_interval'] = device_auth_response['interval']
 
-    qrcode_url = response_json['verification_uri_complete']
-    verification_uri = response_json['verification_uri']
-    user_code = response_json['user_code']
+    qrcode_url = device_auth_response['verification_uri_complete']
+    verification_uri = device_auth_response['verification_uri']
+    user_code = device_auth_response['user_code']
 
     # No need to print, unless for debugging. Instead, pass these to the template
     qr_cde_generation(qrcode_url)
