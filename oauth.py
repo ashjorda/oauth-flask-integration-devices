@@ -1,7 +1,7 @@
 from flask import Flask, render_template, jsonify
+from threading import Thread
 import requests
 import time
-from threading import Thread
 import os
 import qrcode
 
@@ -20,9 +20,9 @@ session = {
 }
 
 # Define your clientID and client secret
-clientID = os.environ['clientID']
-clientSecret = os.environ['secretID']
-credentials = os.environ['credentials']
+clientID = '<clientID>'
+clientSecret = '<clientID>'
+credentials = '<clientID:clientSecret>' #base64 ecnode the clientid and client secret with a colon in the middle
 
 
 def qr_cde_generation(url):
