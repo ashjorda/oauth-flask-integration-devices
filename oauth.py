@@ -130,11 +130,11 @@ def sign_in():
     return render_template("sign-in.html", verification_url=verification_uri, user_code=user_code, secure_prefix=secure_prefix)
 
 
-@app.route("/granted")
-def granted():
+@app.route("/granted/<secure_prefix>")
+def granted(secure_prefix):
     # Check if the access token is ready and render the granted.html template
-    if session['token_ready']:
-        return render_template("granted.html")
+    if session[secure_prefix]['token_ready']:
+        return render_template("granted.html", secure_prefix=secure_prefix)
     else:
         # If the token isn't ready, you might want to inform the user or redirect
         return "Access token not ready yet. Please try again later."
