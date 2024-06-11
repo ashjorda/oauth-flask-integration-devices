@@ -123,11 +123,11 @@ def sign_in():
     qr_cde_generation(qrcode_url)
 
     # Start polling in a separate thread
-    thread = Thread(target=poll_for_access_token, args=(session['device_code'], session['poll_interval'],))
+    thread = Thread(target=poll_for_access_token, args=(session[secure_prefix]['device_code'], session[secure_prefix]['poll_interval'], secure_prefix))
     thread.start()
 
     # Render the template and pass verification url, and user code for manual user authorization
-    return render_template("index.html", verification_url=verification_uri, user_code=user_code)
+    return render_template("sign-in.html", verification_url=verification_uri, user_code=user_code, secure_prefix=secure_prefix)
 
 
 @app.route("/granted")
