@@ -82,6 +82,7 @@ def whoami_lookup():
 
 @app.route("/")
 def main_page():
+    return render_template("index.html")
     """Main Grant page"""
     scopes = "meeting:recordings_read spark:all spark:kms"
     params = {'client_id': clientID, 'scope': scopes}
