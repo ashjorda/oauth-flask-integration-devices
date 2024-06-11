@@ -31,7 +31,7 @@ def qr_cde_generation(url):
     img.save('./static/qr_code.png')
 
 
-def poll_for_access_token(device_code, poll_interval):
+def poll_for_access_token(device_code, poll_interval, secure_prefix):
     """Poll the token endpoint for an access token."""
     token_url = "https://webexapis.com/v1/device/token"
     headers = {'Authorization': f'Basic {credentials}'}
@@ -47,11 +47,10 @@ def poll_for_access_token(device_code, poll_interval):
         token_request = requests.post(url=token_url, data=body, headers=headers)
         if token_request.status_code == 200:
             # Store the access token in session or another secure place
-            session['access_token'] = token_request.json()['access_token']
-            session['refresh_token'] = token_request.json()['refresh_token']
-            session['token_ready'] = True
+            session[secure_prefix]['access_token'] = token_request.json()['access_token']
+            session[secure_prefix]['refresh_token'] = token_request.json()['refresh_token']
+            session[secure_prefix]['token_ready'] = True
             print(token_request.json())
-            break
         else:
             # Handle other errors (e.g., 'slow_down', 'expired_token')
             print("Response Code:", token_request.status_code,
