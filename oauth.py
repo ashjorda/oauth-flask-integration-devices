@@ -74,9 +74,9 @@ def device_refresh_token():
     session['refresh_token'] = token_refresh_reqeust.json()['refresh_token']
 
 
-def whoami_lookup():
+def whoami_lookup(secure_prefix):
     people_api_url = "https://webexapis.com/v1/people/me?callingData=true"
-    headers = {'Authorization': f"Bearer {session['access_token']}"}
+    headers = {'Authorization': f"Bearer {session[secure_prefix]['access_token']}"}
     people_api = requests.get(url=people_api_url, headers=headers)
     return people_api
 
@@ -140,14 +140,14 @@ def granted(secure_prefix):
         return "Access token not ready yet. Please try again later."
 
 
-@app.route("/whoami")
-def whoami():
+@app.route("/whoami/<secure_prefix>")
+def whoami(secure_prefix):
     # Using the device access token, use /people API to display user information.
-    user_info = whoami_lookup()
+    user_info = whoami_lookup(secure_prefix)
 
     if user_info.status_code == 401:
         device_refresh_token()
-        user_info = whoami_lookup()
+        user_info = whoami_lookup(secure_prefix)
     else:
         user_info = user_info.json()
 
