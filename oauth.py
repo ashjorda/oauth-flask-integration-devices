@@ -154,9 +154,9 @@ def whoami(secure_prefix):
     return render_template("whoami.html", me=user_info)
 
 
-@app.route("/access_token_ready")
-def access_token_ready():
-    return jsonify({'token_ready': session['token_ready']})
+@app.route("/access_token_ready/<secure_prefix>")
+def access_token_ready(secure_prefix):
+    return jsonify({'token_ready': session[secure_prefix]['token_ready']})
 
 
 if __name__ == "__main__":
