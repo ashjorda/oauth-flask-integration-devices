@@ -4,6 +4,7 @@ import requests
 import time
 import os
 import qrcode
+import secrets
 
 os.environ['OAUTHLIB_INSECURE_TRANSPORT'] = '1'
 
@@ -94,9 +95,25 @@ def sign_in():
     device_auth_request = requests.post(url=device_auth_url, data=params)
     device_auth_response = device_auth_request.json()
     print(device_auth_response)
-    # Store device code in session to use it in polling later
-    session['device_code'] = device_auth_response['device_code']
-    session['poll_interval'] = device_auth_response['interval']
+
+    # Generate a secure random alphanumeric string to be used as part of the session key
+    secure_prefix = secrets.token_hex(8)  # Generates a secure random string
+
+    # Create a nested dictionary with the desired structure
+    nested_dict = {
+        'access_token': None,
+        'refresh_token': None,
+        'token_ready': False,
+        'device_code': device_auth_response['device_code'],
+        'poll_interval': device_auth_response['interval']
+    }
+
+    # Store the nested dictionary in the session using secure_prefix as the key
+    session[secure_prefix] = nested_dict
+
+    # Store the device code using the unique session key
+    session[secure_prefix]['device_code'] = device_auth_response['device_code']
+    session[secure_prefix]['poll_interval'] = device_auth_response['interval']
 
     qrcode_url = device_auth_response['verification_uri_complete']
     verification_uri = device_auth_response['verification_uri']
