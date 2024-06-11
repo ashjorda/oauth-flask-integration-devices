@@ -12,18 +12,12 @@ app = Flask(__name__)
 app.secret_key = os.urandom(16)
 
 # Global storage for the access token
-session = {
-    'access_token': None,
-    'refresh_token': None,
-    'token_ready': False,
-    'device_code': None,
-    'poll_interval': 0,
-}
+session = {}
 
 # Define your clientID and client secret
-clientID = '<clientID>'
-clientSecret = '<clientID>'
-credentials = '<clientID:clientSecret>' #base64 ecnode the clientid and client secret with a colon in the middle
+clientID = 'Ca213138bde6a0995b5a0493d29475be54bf006f8536dafdb3d53d5c093ed090a'
+clientSecret = 'c912d72d2eaaf17d34f18e90ec9b35361e2801dce00b0e916985ae3da1e3bda2'
+credentials = 'Q2EyMTMxMzhiZGU2YTA5OTViNWEwNDkzZDI5NDc1YmU1NGJmMDA2Zjg1MzZkYWZkYjNkNTNkNWMwOTNlZDA5MGE6YzkxMmQ3MmQyZWFhZjE3ZDM0ZjE4ZTkwZWM5YjM1MzYxZTI4MDFkY2UwMGIwZTkxNjk4NWFlM2RhMWUzYmRhMg=='  #base64 ecnode the clientid and client secret with a colon in the middle
 
 
 def qr_cde_generation(url):
