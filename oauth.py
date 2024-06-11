@@ -15,9 +15,9 @@ app.secret_key = os.urandom(16)
 session = {}
 
 # Define your clientID and client secret
-clientID = '<clientID>'
-clientSecret = '<client_secret>'
-credentials = '<credentials here>'  #base64 ecnode the clientid and client secret with a colon in the middle
+clientID = ''
+clientSecret = ''
+credentials = ''  #base64 ecnode the clientid and client secret with a colon in the middle
 
 
 def qr_cde_generation(url):
@@ -45,6 +45,7 @@ def poll_for_access_token(device_code, poll_interval, secure_prefix):
             session[secure_prefix]['refresh_token'] = token_request.json()['refresh_token']
             session[secure_prefix]['token_ready'] = True
             print(token_request.json())
+            break
         else:
             # Handle other errors (e.g., 'slow_down', 'expired_token')
             print("Response Code:", token_request.status_code,
